@@ -8,13 +8,19 @@ sys.modules['cocotb.regression'] = importlib.import_module("cocotb_stub_sim.stub
 
 from cocotb import *
 
+def tearDown():
+    """Clean-up leftover state to ensure that future tests run properly"""
+    from .stub.mgr import Mgr
+
+    Mgr.init()
+
 def run(entry):
+    import cocotb
     from .stub.regression import RegressionManager
     from .stub.mgr import Mgr
 
     RegressionManager._entry = entry
     try:
-        import cocotb
         cocotb._initialise_testbench([])
     except Exception as e:
         print("Exception: %s" % str(e), flush=True)
@@ -22,5 +28,17 @@ def run(entry):
     mgr = Mgr.inst()
 
     mgr.run()
+
+    rgr = RegressionManager.inst()
+
+    if rgr.outcome is None:
+        raise Exception("Internal error - no result")
+    elif isinstance(rgr.outcome, cocotb.outcomes.Error):
+        raise Exception("Test failed: %s" % str(rgr.outcome.error))
+    else:
+        """Test status is OK"""
+        pass
+
+
     
 

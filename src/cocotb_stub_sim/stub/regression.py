@@ -1,10 +1,13 @@
 class RegressionManager(object):
 
     _entry = None
+    _inst  = None
 
     def __init__(self, dut, tests):
         self._dut = dut
         self._ev = None
+        self._outcome = None
+        RegressionManager._inst = self
 
     def execute(self):
         """Wraps the 'entry' method to look like a cocotb test"""
@@ -16,7 +19,6 @@ class RegressionManager(object):
             self._dut)
 
         test = test_init_outcome.get()
-        print("outcome: %s" % str(test))
 
         cocotb.scheduler._add_test(test)
 
@@ -27,12 +29,21 @@ class RegressionManager(object):
     async def entry(self, dut):
         await RegressionManager._entry(self._dut)
 
-    def _handle_result(self, *args, **kwargs):
-        print("TODO: _handle_result %s %s" % (str(args), str(kwargs)))
+    def _handle_result(self, test):
+        """Receives the status of a test"""
+        self._outcome = test._outcome
 
     def _execute(self):
         self.execute()
 
+    @property
+    def outcome(self):
+        return self._outcome
+
     @classmethod
     def from_discovery(cls, dut):
         return RegressionManager(dut, [])
+
+    @classmethod
+    def inst(cls):
+        return cls._inst

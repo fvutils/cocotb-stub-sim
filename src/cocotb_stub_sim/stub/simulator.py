@@ -43,15 +43,13 @@ def log_msg(*args, **kwargs):
     raise Exception("cocotb-stub-sim: Calling cocotb log_msg is not supported")
 
 def get_root_handle(root_name):
-    print("get_root_handle: %s" % str(root_name))
     return DummyHandle()
 
 def register_timed_callback(t, cb, ud):
-    print("register_timed_callback %s cb=%s" % (str(t), str(cb)))
     try:
         return Mgr.inst().register_timed_callback(t, cb, ud)
     except Exception as e:
-        print("Exception: %s" % str(e))
+        print("Exception while registering timed callback: %s" % str(e))
         traceback.print_exc()
 
 def register_value_change_callback(*args, **kwargs):
@@ -67,7 +65,6 @@ def register_rwsynch_callback(*args, **kwargs):
     raise Exception("cocotb-stub-sim: Setting cocotb rwsynch callbacks is not supported")
 
 def stop_simulator():
-    print("stop_simulator")
     Mgr.inst().stop_simulator()
 
 def log_level(level):
@@ -88,3 +85,4 @@ def get_simulator_product():
 
 def get_simulator_version():
     return "0.0.1"
+
